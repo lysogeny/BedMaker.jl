@@ -47,6 +47,7 @@ function Genome(reader::GFF3.Reader; name="", progress=true, skipcrap=true)
     record = GFF3.Record()
     i = 0
     while !eof(reader)
+        read!(reader, record)
         i += 1
         if (i % 1_000 == 0) & progress
             print("\r")
@@ -54,7 +55,6 @@ function Genome(reader::GFF3.Reader; name="", progress=true, skipcrap=true)
             print("now at $(length(features)) id features ")
             print("$(sum(length.(values(sequence_regions)))) total ")
         end
-        read!(reader, record)
         keys = [attr.first for attr in GFF3.attributes(record)]
         if !("ID" in keys) & !("Parent" in keys) & skipcrap
             continue
@@ -94,3 +94,30 @@ function Base.show(io::IO, ::MIME"text/plain", genome::Genome)
     plural_print(io, primary_count, "Top level ID", level=2)
 end
 
+function features(genome::Genome)
+    vcat(values(genome.sequence_regions)...)
+end
+
+function features(genome::Genome, fun::Function)
+    filter(fun, features(genome))
+end
+
+function features_with_id(genome::Genome)
+    features(genome, x -> x.id != nothing)
+end
+
+function features_with_id(genome::Genome, fun::Function)
+    filter(fun, features_with_id(genome))
+end
+
+# Horrible ensembl-specific hacks.
+# TODO: parse the sequence type's SO to actually figure out if something is a gene.
+# This would also avoid ignoring id-less genes.
+chromosomes(genome::Genome) = features_with_id(genome, x -> contains(x.id, "chromosome:"))
+transcripts(genome::Genome) = features_with_id(genome, x -> contains(x.id, "transcript:"))
+genes(genome::Genome) = features_with_id(genome, x -> contains(x.id, "gene:"))
+ref_sequence(genome::Genome, ref::AbstractString) = get(genome.sequence_regions, ref, Feature[])
+#function positions(genome::Genome, tuple::Tuple{N, M}) where {N <: Number, M <: Number}
+#    @assert tuple[1] <= tuple[2] "Tuple is unsorted"
+#    ref_sequence(genome, x -> (tuple[1] <= x.pos.pos_start <= tuple[2]) | (tuple[1] <= x.pos.pos_end <= tuple[2]))
+#end

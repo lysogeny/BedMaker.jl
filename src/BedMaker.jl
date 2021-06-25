@@ -8,6 +8,6 @@ include("helpers.jl")
 include("features.jl")
 include("genome.jl")
 
-export Genome, Feature, FeaturePosition, FeatureMeta
+export Genome, Feature, FeaturePosition, FeatureMeta, genes, transcripts, chromosomes, features, ref_sequence
 
 end # module

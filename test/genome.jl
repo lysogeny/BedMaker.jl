@@ -17,3 +17,13 @@ using GFF3
     @test all([child.parent === actb for child in actb.children])
     prot_coding = filter(x -> x.meta.type == "mRNA", actb.children)
 end
+
+@testset "Test filters on actb" begin
+    reader = open("actb.gff3") |> GFF3.Reader
+    genome = Genome(reader, skipcrap=false)
+    @test length(chromosomes(genome)) == 1
+    @test length(genes(genome)) == 2
+    @test length(transcripts(genome)) == 10
+    @test length(ref_sequence(genome, "5")) == 109
+    @test ref_sequence(genome, "1") == Feature[]
+end
