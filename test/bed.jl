@@ -9,7 +9,7 @@
         actb.pos.pos_start-1,
         actb.pos.pos_stop,
         actb.id,
-        '.',
+        0,
         Char(actb.pos.strand)
     )
     @test BedMaker.SmallRecord(actb) == mock

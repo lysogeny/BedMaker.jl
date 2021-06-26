@@ -5,7 +5,7 @@ struct SmallRecord <: AbstractRecord
     start::UInt32
     stop::UInt32
     name::Union{Char, String}
-    score::Union{Char, UInt8}
+    score::UInt8
     strand::Char
     #thick_start::UInt32
     #thick_end::UInt32
@@ -13,7 +13,7 @@ struct SmallRecord <: AbstractRecord
     #block_count::UInt32
     #block_size::Vector{UInt32}
     #block_start::Vector{UInt32}
-    SmallRecord(chrom, start, stop, name='.', score='.', strand='.') = new(chrom, start, stop, name, score, strand)
+    SmallRecord(chrom, start, stop, name='.', score=0, strand='.') = new(chrom, start, stop, name, score, strand)
 end
 
 function BedMaker.SmallRecord(feature::Feature)
@@ -22,7 +22,7 @@ function BedMaker.SmallRecord(feature::Feature)
         feature.pos.pos_start-1, # open, but offset
         feature.pos.pos_stop, # closed
         feature.id == nothing ? '.' : feature.id,
-        '.',
+        0,
         Char(feature.pos.strand)
     )
 end
