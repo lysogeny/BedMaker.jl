@@ -7,7 +7,17 @@ using GenomicFeatures: STRAND_POS, STRAND_NEG, STRAND_NA, STRAND_BOTH
 include("helpers.jl")
 include("features.jl")
 include("genome.jl")
+include("bed.jl")
 
-export Genome, Feature, FeaturePosition, FeatureMeta, genes, transcripts, chromosomes, features, ref_sequence
+export Genome, 
+    Feature, 
+    FeaturePosition, 
+    FeatureMeta, 
+    genes, 
+    transcripts,
+    chromosomes, 
+    features, 
+    ref_sequence,
+    BEDWriter
 
 end # module

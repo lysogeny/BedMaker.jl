@@ -21,6 +21,20 @@ function FeatureStrand(record::GFF3.Record)
     return FeatureStrand(i)
 end
 
+function Base.Char(strand::FeatureStrand)
+    if strand == strand_pos
+        return '+'
+    elseif strand == strand_neg
+        return '-'
+    elseif strand == strand_both
+        return '.'
+    elseif strand == strand_none
+        return '?'
+    else
+        @error "Strand fail cannot be represented as a character"
+    end
+end
+
 """FeaturePhase
 
 Enum for encoding feature's phase (a CDS specific GFF3 field)

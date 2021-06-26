@@ -2,6 +2,7 @@ using Test, BedMaker
 
 tests = [
     "genome.jl",
+    "bed.jl"
 ]
 
 for test in tests
