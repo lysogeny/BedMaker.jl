@@ -66,7 +66,6 @@ struct FeaturePosition <: AbstractPosition
     pos_start::Integer
     pos_stop::Integer
     strand::FeatureStrand
-    phase::FeaturePhase
 end
 
 """FeaturePosition(record::GFF3.Record)
@@ -78,8 +77,7 @@ function FeaturePosition(record::GFF3.Record)
     pos_start = GFF3.seqstart(record)
     pos_stop = GFF3.seqend(record)
     strand = FeatureStrand(record)
-    phase = FeaturePhase(record)
-    FeaturePosition(seqid, pos_start, pos_stop, strand, phase)
+    FeaturePosition(seqid, pos_start, pos_stop, strand)
 end
 
 """FeatureMeta
@@ -96,6 +94,7 @@ struct FeatureMeta
     name::Union{Nothing, AbstractString}
     description::Union{Nothing, AbstractString}
     type::AbstractString
+    phase::FeaturePhase
     attributes::Dict{String, Vector{String}}
 end
 
@@ -108,7 +107,8 @@ function FeatureMeta(record::GFF3.Record)
     name = get(attributes, "Name", [nothing])[1]
     description = get(attributes, "description", [nothing])[1]
     type = GFF3.featuretype(record)
-    FeatureMeta(name, description, type, attributes)
+    phase = FeaturePhase(record)
+    FeatureMeta(name, description, type, phase, attributes)
 end
 
 """Feature
