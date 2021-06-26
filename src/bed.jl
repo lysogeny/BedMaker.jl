@@ -27,6 +27,17 @@ function BedMaker.SmallRecord(feature::Feature)
     )
 end
 
+function BedMaker.SmallRecord(feature::Feature, name::String)
+    SmallRecord(
+        feature.pos.seqid,
+        feature.pos.pos_start-1, # open, but offset
+        feature.pos.pos_stop, # closed
+        name,
+        '.',
+        Char(feature.pos.strand)
+    )
+end
+
 struct BEDWriter
     output::IO
 end

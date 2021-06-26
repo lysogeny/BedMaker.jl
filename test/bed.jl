@@ -13,6 +13,9 @@
         Char(actb.pos.strand)
     )
     @test BedMaker.SmallRecord(actb) == mock
+    custom_name = BedMaker.SmallRecord(actb, "Test") 
+    @test custom_name != mock
+    @test custom_name.name == "Test"
 end
 
 @testset "Test bed writing" begin
