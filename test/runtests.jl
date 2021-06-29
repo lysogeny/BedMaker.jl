@@ -1,8 +1,9 @@
 using Test, BedMaker
 
 tests = [
+    "intervals.jl",
     "genome.jl",
-    "bed.jl"
+    "bed.jl",
 ]
 
 for test in tests
