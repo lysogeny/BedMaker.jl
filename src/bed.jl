@@ -17,7 +17,7 @@ struct SmallRecord <: AbstractRecord
     SmallRecord(pos, name='.', score=0) = new(pos, name, score)
 end
 
-function BedMaker.SmallRecord(feature::Feature)
+function SmallRecord(feature::Feature)
     SmallRecord(
         feature.pos,
         feature.id == nothing ? '.' : feature.id,
@@ -81,11 +81,16 @@ end
 function Base.union(x::Vector{SmallRecord})
     groups = group(x)
     grouped = map(y -> x[groups .== y], unique(groups))
+    #println("There are $(length(grouped)) groups:")
     result = map(grouped) do group_values
+        #println(length(group_values))
         intervals = [i.pos for i in group_values]
+        #println(length(intervals))
         new_pos = union(intervals)
+        #println(length(new_pos))
         [SmallRecord(x, group_values[1].name) for x in new_pos]
     end
+    #println("with $(length(reduce(vcat, result))) records")
     reduce(vcat, result)
 end
 

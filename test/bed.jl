@@ -1,3 +1,4 @@
+using GFF3
 using BED
 using BedMaker: SmallRecord
 
@@ -88,17 +89,28 @@ end
     @test actb_transcript_merge[1].pos == actb.pos
 end
 
-#@testset "BED Records can union exons to create spliced transcripts" begin
-#    reader = open("actb.gff3") |> GFF3.Reader
-#    genome = Genome(reader)
-#    actb = filter(x -> x.meta.name == "Actb", genes(genome))[1]
-#    map(actb.children) do child
-#        filter(x -> child.children)
-#    end
-#    actb_transcripts = [SmallRecord(c, actb.id) for c in actb.children]
-#end
-
-
+@testset "BED Records can union exons to create spliced transcripts" begin
+    reader = open("actb.gff3") |> GFF3.Reader
+    genome = Genome(reader)
+    actb = filter(x -> x.meta.name == "Actb", genes(genome))[1]
+    exons = map(actb.children) do child
+        exons = filter(x -> x.meta.type == "exon", child.children)
+        SmallRecord.(exons, actb.id)
+    end
+    exons = reduce(vcat, exons)
+    intervals = [x.pos.pos for x in exons]
+    interval_overlaps = BedMaker.group_overlaps(sort(intervals))
+    println("Overlaps: $(length(unique(interval_overlaps)))")
+    @test length(exons) == 35
+    exon = union(exons)
+    # no overlaps should remain
+    intervals = [x.pos.pos for x in exon]
+    interval_overlaps = BedMaker.group_overlaps(intervals)
+    @test length(interval_overlaps) == length(unique(interval_overlaps))
+    @test length(exon) == 5
+    writer = BEDWriter(open("temp.bed", "w"))
+    write(writer, exon)
+end
 
 #@testset "interval merges" begin
 #    i1 = [(1, 3), (2, 5), (6, 9), (12, 15), (15, 17), (20, 25)]
