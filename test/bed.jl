@@ -1,14 +1,15 @@
 using BED
+using BedMaker: SmallRecord
 
 @testset "Test bed entry creation" begin
     reader = open("actb.gff3") |> GFF3.Reader
     genome = Genome(reader)
     genes_flat = genes(genome)
-    @test typeof(BedMaker.SmallRecord.(genes_flat)) == Vector{BedMaker.SmallRecord}
+    @test typeof(SmallRecord.(genes_flat)) == Vector{SmallRecord}
     actb = filter(x -> x.meta.name == "Actb", genes_flat)[1]
-    mock = BedMaker.SmallRecord(actb.pos, actb.id, 0)
-    @test BedMaker.SmallRecord(actb) == mock
-    custom_name = BedMaker.SmallRecord(actb, "Test") 
+    mock = SmallRecord(actb.pos, actb.id, 0)
+    @test SmallRecord(actb) == mock
+    custom_name = SmallRecord(actb, "Test") 
     @test custom_name != mock
     @test custom_name.name == "Test"
 end
@@ -17,7 +18,7 @@ end
     reader = open("actb.gff3") |> GFF3.Reader
     genome = Genome(reader)
     genes_flat = genes(genome)
-    records = BedMaker.SmallRecord.(genes_flat)
+    records = SmallRecord.(genes_flat)
     out_files = Dict(
         :small_vector => tempname(), 
         :feature_vector => tempname(), 
@@ -62,7 +63,7 @@ end
 @testset "BED is readable" begin
     reader = open("actb.gff3") |> GFF3.Reader
     genome = Genome(reader)
-    records = BedMaker.SmallRecord.(genes(genome))
+    records = SmallRecord.(genes(genome))
     out_file = tempname()
     # Writing small records
     open(out_file, "w") do io
@@ -75,6 +76,29 @@ end
         @test length(entries) == length(records)
     end
 end
+
+@testset "BED Records can union" begin
+    reader = open("actb.gff3") |> GFF3.Reader
+    genome = Genome(reader)
+    genes_flat = genes(genome)
+    actb = filter(x -> x.meta.name == "Actb", genes_flat)[1]
+    actb_transcripts = [SmallRecord(c, actb.id) for c in actb.children]
+    actb_transcript_merge = union(actb_transcripts)
+    @test length(actb_transcript_merge) == 1
+    @test actb_transcript_merge[1].pos == actb.pos
+end
+
+#@testset "BED Records can union exons to create spliced transcripts" begin
+#    reader = open("actb.gff3") |> GFF3.Reader
+#    genome = Genome(reader)
+#    actb = filter(x -> x.meta.name == "Actb", genes(genome))[1]
+#    map(actb.children) do child
+#        filter(x -> child.children)
+#    end
+#    actb_transcripts = [SmallRecord(c, actb.id) for c in actb.children]
+#end
+
+
 
 #@testset "interval merges" begin
 #    i1 = [(1, 3), (2, 5), (6, 9), (12, 15), (15, 17), (20, 25)]

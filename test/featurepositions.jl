@@ -19,6 +19,18 @@ using BedMaker: FeaturePosition, isoverlap_sticky, isoverlap
     @test pos.seqid == "1"
 end
 
+@testset "FeaturePosition (in)equality" begin
+    x = FeaturePosition("1", 1, 10, '+')
+    y1 = FeaturePosition("1", 1, 10, '+')
+    y2 = FeaturePosition("2", 1, 10, '+')
+    y3 = FeaturePosition("1", 5, 10, '+')
+    y4 = FeaturePosition("1", 1, 10, '-')
+    @test x == y1
+    @test x != y2
+    @test x != y3
+    @test x != y4
+end
+
 @testset "FeaturePosition can union elements in same group" begin
     # Simple merge, two things on same group
     pos = [FeaturePosition("1", 1, 10, '+'),

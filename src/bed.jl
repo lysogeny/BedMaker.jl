@@ -1,4 +1,4 @@
-abstract type AbstractRecord end
+abstract type AbstractRecord <: AbstractPosition end
 
 struct SmallRecord <: AbstractRecord
     pos::FeaturePosition
@@ -67,3 +67,25 @@ function Base.write(io::IO, record::SmallRecord)
     #fields = [record.chrom, record.start, record.stop, record.name, record.score, record.strand]
     write(io, join(string.(fields), "\t")*'\n')
 end
+
+function grouping_value(x::SmallRecord)
+    x.name
+end
+
+# We group with seqids and phases
+function group(x::Vector{SmallRecord})
+    groups = unique([grouping_value(i) for i in x])
+    [findfirst([grouping_value(i) == group for group in groups]) for i in x]
+end
+
+function Base.union(x::Vector{SmallRecord})
+    groups = group(x)
+    grouped = map(y -> x[groups .== y], unique(groups))
+    result = map(grouped) do group_values
+        intervals = [i.pos for i in group_values]
+        new_pos = union(intervals)
+        [SmallRecord(x, group_values[1].name) for x in new_pos]
+    end
+    reduce(vcat, result)
+end
+

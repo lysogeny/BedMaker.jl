@@ -1,4 +1,6 @@
-struct Interval
+abstract type AbstractPosition end
+
+struct Interval <: AbstractPosition
     start::UInt
     stop::UInt
     Interval(start, stop) = (start <= stop) ? new(start, stop) : throw(ArgumentError("start is bigger than stop"))

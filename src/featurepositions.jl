@@ -56,7 +56,7 @@ FeaturePosition is structured as follows:
 - `strand::FeatureStrand`: Strand Information
 - `phase::FeaturePhase`: CDS-specific Phase information.
 """
-struct FeaturePosition
+struct FeaturePosition <: AbstractPosition
     seqid::AbstractString
     pos::Interval
     strand::FeatureStrand
