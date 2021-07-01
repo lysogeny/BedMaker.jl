@@ -2,6 +2,7 @@ using Test, BedMaker
 
 tests = [
     "intervals.jl",
+    "featurepositions.jl",
     "genome.jl",
     "bed.jl",
 ]

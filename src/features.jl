@@ -1,40 +1,3 @@
-
-"""FeatureStrand
-
-Enum for encoding feature's strandedness
-"""
-@enum FeatureStrand strand_pos=1 strand_neg=2 strand_both=3 strand_none=4 strand_fail=5
-
-function FeatureStrand(record::GFF3.Record)
-    if GFF3.ismissing(record, record.strand)
-        return FeatureStrand(3)
-    end
-    strand = GFF3.strand(record)
-    checks = [STRAND_POS, STRAND_NEG, STRAND_BOTH, STRAND_NA]
-    i = 1
-    while i <= 4
-        if strand == checks[i]
-            break
-        end
-        i += 1
-    end
-    return FeatureStrand(i)
-end
-
-function Base.Char(strand::FeatureStrand)
-    if strand == strand_pos
-        return '+'
-    elseif strand == strand_neg
-        return '-'
-    elseif strand == strand_both
-        return '.'
-    elseif strand == strand_none
-        return '?'
-    else
-        @error "Strand fail cannot be represented as a character"
-    end
-end
-
 """FeaturePhase
 
 Enum for encoding feature's phase (a CDS specific GFF3 field)
@@ -46,38 +9,6 @@ function FeaturePhase(record::GFF3.Record)
         return FeaturePhase(-1)
     end
     return FeaturePhase(GFF3.phase(record))
-end
-
-abstract type AbstractPosition end
-
-"""FeaturePosition
-
-Position information for a feature.
-FeaturePosition is structured as follows:
-
-- `seqid::AbstractString`: ID of reference sequence that this feature is on.
-- `pos_start::Integer`: Start position of feature, 1-based
-- `pos_stop::Integer`: Stop position of feature, 1-based
-- `strand::FeatureStrand`: Strand Information
-- `phase::FeaturePhase`: CDS-specific Phase information.
-"""
-struct FeaturePosition <: AbstractPosition
-    seqid::AbstractString
-    pos_start::Integer
-    pos_stop::Integer
-    strand::FeatureStrand
-end
-
-"""FeaturePosition(record::GFF3.Record)
-
-Create feature position from a GFF3 record
-"""
-function FeaturePosition(record::GFF3.Record)
-    seqid = GFF3.seqid(record)
-    pos_start = GFF3.seqstart(record)
-    pos_stop = GFF3.seqend(record)
-    strand = FeatureStrand(record)
-    FeaturePosition(seqid, pos_start, pos_stop, strand)
 end
 
 """FeatureMeta
@@ -122,6 +53,7 @@ Features are structured as follows:
 - `children::Vector{Feature}`: List of child elements of the Feature (Constructed from finding them with `Parent`. Requires that GFF3 is sorted in a sane order, that is parents show up before children.)
 - `parent::Union{Nothing, Feature}`: Parent Feature as understood by optional Attribute `Parent`.
 - `pos::FeaturePosition`: Positional information for this feature
+    pos_stop::Integer
 - `meta::FeatureMeta`: Other meta data for this feature
 """
 mutable struct Feature

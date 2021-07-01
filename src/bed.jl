@@ -19,8 +19,8 @@ end
 function BedMaker.SmallRecord(feature::Feature)
     SmallRecord(
         feature.pos.seqid,
-        feature.pos.pos_start-1, # open, but offset
-        feature.pos.pos_stop, # closed
+        feature.pos.pos.start-1, # open, but offset
+        feature.pos.pos.stop, # closed
         feature.id == nothing ? '.' : feature.id,
         0,
         Char(feature.pos.strand)
@@ -30,8 +30,8 @@ end
 function BedMaker.SmallRecord(feature::Feature, name::String)
     SmallRecord(
         feature.pos.seqid,
-        feature.pos.pos_start-1, # open, but offset
-        feature.pos.pos_stop, # closed
+        feature.pos.pos.start-1, # open, but offset
+        feature.pos.pos.stop, # closed
         name,
         '.',
         Char(feature.pos.strand)

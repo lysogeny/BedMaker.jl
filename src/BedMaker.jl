@@ -4,8 +4,9 @@ import GFF3, BED
 using DataStructures: DefaultDict
 using GenomicFeatures: STRAND_POS, STRAND_NEG, STRAND_NA, STRAND_BOTH
 
-include("intervals.jl")
 include("helpers.jl")
+include("intervals.jl")
+include("featurepositions.jl")
 include("features.jl")
 include("genome.jl")
 include("bed.jl")

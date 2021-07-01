@@ -6,8 +6,8 @@
     actb = filter(x -> x.meta.name == "Actb", genes_flat)[1]
     mock = BedMaker.SmallRecord(
         actb.pos.seqid,
-        actb.pos.pos_start-1,
-        actb.pos.pos_stop,
+        actb.pos.pos.start-1,
+        actb.pos.pos.stop,
         actb.id,
         0,
         Char(actb.pos.strand)
@@ -63,3 +63,9 @@ end
         end
     end
 end
+
+#@testset "interval merges" begin
+#    i1 = [(1, 3), (2, 5), (6, 9), (12, 15), (15, 17), (20, 25)]
+#    [FeaturePosition(i) for i in i1]
+#    FeaturePosition.(i1)
+#end
