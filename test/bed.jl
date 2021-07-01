@@ -1,17 +1,12 @@
+using BED
+
 @testset "Test bed entry creation" begin
     reader = open("actb.gff3") |> GFF3.Reader
     genome = Genome(reader)
     genes_flat = genes(genome)
     @test typeof(BedMaker.SmallRecord.(genes_flat)) == Vector{BedMaker.SmallRecord}
     actb = filter(x -> x.meta.name == "Actb", genes_flat)[1]
-    mock = BedMaker.SmallRecord(
-        actb.pos.seqid,
-        actb.pos.pos.start-1,
-        actb.pos.pos.stop,
-        actb.id,
-        0,
-        Char(actb.pos.strand)
-    )
+    mock = BedMaker.SmallRecord(actb.pos, actb.id, 0)
     @test BedMaker.SmallRecord(actb) == mock
     custom_name = BedMaker.SmallRecord(actb, "Test") 
     @test custom_name != mock
@@ -61,6 +56,23 @@ end
             @test length(findall("gene:ENSMUSG", content)) == 2
             @test length(findall("\t", content)) == 10
         end
+    end
+end
+
+@testset "BED is readable" begin
+    reader = open("actb.gff3") |> GFF3.Reader
+    genome = Genome(reader)
+    records = BedMaker.SmallRecord.(genes(genome))
+    out_file = tempname()
+    # Writing small records
+    open(out_file, "w") do io
+        writer = BEDWriter(io)
+        write(writer, records)
+    end
+    open(out_file, "r") do io
+        reader = BED.Reader(io)
+        entries = collect(reader)
+        @test length(entries) == length(records)
     end
 end
 
